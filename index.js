@@ -31,17 +31,18 @@ const bresenham = (image, { a, b }, color) => {
   if (a.x > b.x) {
     [a, b] = [b, a];
 
+    Δx *= -1;
     Δy *= -1;
   }
 
-  let errorStep = Math.abs(Δy / Δx);
+  let errorStep = Math.abs(Δy);
   let yStep     = Δy < 0 ? -1 : 1;
 
   let y = a.y;
 
   for (let x = a.x; x <= b.x; x++) {
-    if (Math.abs(error) >= 1) {
-      error--;
+    if (error >= Δx) {
+      error -= Δx;
 
       y += yStep;
     }

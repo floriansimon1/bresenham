@@ -15,23 +15,44 @@ const canvasElement = document.querySelector("canvas");
 
 const bresenham = (image, { a, b }, color) => {
   let error = 0;
-  let y     = a.y;
+  let steep = false;
 
-  const Δx = b.x - a.x;
-  const Δy = b.y - a.y;
+  let Δx = b.x - a.x;
+  let Δy = b.y - a.y;
 
-  let yStep = Δy / Δx;
+  if (Math.abs(Δx) < Math.abs(Δy)) {
+    [Δx, Δy]   = [Δy, Δx];
+    [a.x, a.y] = [a.y, a.x];
+    [b.x, b.y] = [b.y, b.x];
 
-  for (let it = 0; it < Δx; it++) {
-    if (error >= 1) {
+    steep = true;
+  }
+
+  if (a.x > b.x) {
+    [a, b] = [b, a];
+
+    Δy *= -1;
+  }
+
+  let errorStep = Math.abs(Δy / Δx);
+  let yStep     = Δy < 0 ? -1 : 1;
+
+  let y = a.y;
+
+  for (let x = a.x; x <= b.x; x++) {
+    if (Math.abs(error) >= 1) {
       error--;
 
-      y++;
+      y += yStep;
     }
 
-    error += yStep;
+    error += errorStep;
 
-    putPixel(image, a.x + it, y, color);
+    if (steep) {
+      putPixel(image, y, x, color);
+    } else {
+      putPixel(image, x, y, color);
+    }
   }
 };
 
@@ -47,18 +68,110 @@ for (let it = 0; it < width * height * 4; it += 4) {
 
 const lineColor = { r: 255, g: 255, b: 255 };
 
-const line = {
-  a: {
-    x: 20,
-    y: 20
-  },
+const lines = [
+  {
+    a: {
+      x: 20,
+      y: 20
+    },
 
-  b: {
-    x: 480,
-    y: 40
+    b: {
+      x: 200,
+      y: 200
+    }
+  }, {
+    a: {
+      x: 200,
+      y: 200
+    },
+
+    b: {
+      x: 20,
+      y: 20
+    }
+  }, {
+    a: {
+      x: 20,
+      y: 200
+    },
+
+    b: {
+      x: 200,
+      y: 20
+    }
+  }, {
+    a: {
+      x: 200,
+      y: 20
+    },
+
+    b: {
+      x: 20,
+      y: 200
+    }
+  }, {
+    a: {
+      x: 110,
+      y: 20
+    },
+
+    b: {
+      x: 110,
+      y: 200
+    }
+  }, {
+    a: {
+      x: 200,
+      y: 20
+    },
+
+    b: {
+      x: 20,
+      y: 200
+    }
+  }, {
+    a: {
+      x: 200,
+      y: 30
+    },
+
+    b: {
+      x: 20,
+      y: 60
+    }
+  }, {
+    a: {
+      x: 200,
+      y: 60
+    },
+
+    b: {
+      x: 20,
+      y: 30
+    }
+  }, {
+    a: {
+      x: 30,
+      y: 200
+    },
+
+    b: {
+      x: 60,
+      y: 20
+    }
+  }, {
+    a: {
+      x: 60,
+      y: 200
+    },
+
+    b: {
+      x: 30,
+      y: 20
+    }
   }
-};
+];
 
-bresenham(image, line, lineColor);
+lines.map(line => bresenham(image, line, lineColor));
 
 context.putImageData(image, 0, 0);

@@ -14,7 +14,6 @@ const putPixel = (image, x, y, { r, g, b }) => {
 const canvasElement = document.querySelector("canvas");
 
 const bresenham = (image, { a, b }, color) => {
-  let error = 0;
   let steep = false;
 
   let Δx = b.x - a.x;
@@ -28,20 +27,22 @@ const bresenham = (image, { a, b }, color) => {
     steep = true;
   }
 
-  if (a.x > b.x) {
+  if (Δx < 0) {
     [a, b] = [b, a];
 
     Δy *= -1;
+    Δx *= -1;
   }
 
-  let errorStep = Math.abs(Δy / Δx);
+  let error     = -Δx;
+  let errorStep = 2 * Math.abs(Δy);
   let yStep     = Δy < 0 ? -1 : 1;
 
   let y = a.y;
 
   for (let x = a.x; x <= b.x; x++) {
-    if (Math.abs(error) >= 1) {
-      error--;
+    if (error >= 0) {
+      error -= 2 * Δx;
 
       y += yStep;
     }
